@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <title>{{ page_title }}</title>
@@ -8,8 +8,8 @@
     {{ 'application.css' | asset_url | stylesheet_tag }}
     {{ 'application.js'  | asset_url | script_tag }}
   </head>
-<body class="bg-white text-gray-900 antialiased">
-  {% section 'nav-uniflame' %}
-</body>
-
+  <body class="bg-white text-gray-900 antialiased">
+    {% section 'nav-uniflame' %}
+    {{ content_for_layout }}
+  </body>
 </html>
