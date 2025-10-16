@@ -1,29 +1,180 @@
 {% assign current_variant = product.selected_or_first_available_variant %}
 {% assign featured_image = current_variant.featured_image | default: product.featured_image %}
-<img src="{{ featured_image | img_url: 'large' }}" alt="{{ featured_image.alt | escape }}" id="ProductPhotoImg">
-{% for image in product.images %}
-  <a href="{{ image.src | img_url: 'large' }}">
-    <img src="{{ image.src | img_url: 'compact' }}" alt="{{ image.alt | escape }}">
-  </a>
-{% endfor %}
-<h1>{{ product.title }}</h1>
-<form action="/cart/add" method="post" enctype="multipart/form-data" id="AddToCartForm">
-  <select name="id" id="productSelect">
-    {% for variant in product.variants %}
-      {% if variant.available %}
-        <option value="{{ variant.id }}">
-          {{ variant.title }} - {{ variant.price | money_with_currency }}
-        </option>
-      {% else %}
-        <option disabled="disabled">
-          {{ variant.title }} - sold out
-        </option>
-      {% endif %}
-    {% endfor %}
-  </select>
-  {{ current_variant.price | money }}
-  <label for="Quantity">quantity</label>
-  <input type="number" id="Quantity" name="quantity" value="1" min="1">
-  <button type="submit" name="add" id="AddToCart">Add to cart</button>
-</form>
-<div>{{ product.description }}</div>
+{% assign on_sale = current_variant.compare_at_price > current_variant.price %}
+
+<main class="bg-white">
+  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+      <div class="space-y-6">
+        <div class="relative overflow-hidden rounded-3xl bg-gray-100 shadow-sm shadow-gray-200/50">
+          {% if featured_image %}
+            <img
+              src="{{ featured_image | img_url: '1200x' }}"
+              alt="{{ featured_image.alt | escape }}"
+              class="w-full object-cover"
+              style="aspect-ratio: 4 / 5;"
+            >
+          {% else %}
+            <div class="flex w-full items-center justify-center bg-gray-100 text-sm font-semibold uppercase tracking-[0.4em] text-gray-400" style="aspect-ratio: 4 / 5;">
+              No image
+            </div>
+          {% endif %}
+          {% if on_sale %}
+            <span class="absolute left-6 top-6 inline-flex items-center rounded-full bg-black px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+              Sale
+            </span>
+          {% endif %}
+        </div>
+
+        {% if product.images.size > 1 %}
+          <div class="grid grid-cols-4 gap-3">
+            {% for image in product.images %}
+              <a href="{{ image.src | img_url: '1200x' }}" class="group overflow-hidden rounded-2xl border border-transparent bg-gray-50 transition hover:border-gray-200">
+                <img
+                  src="{{ image.src | img_url: '400x' }}"
+                  alt="{{ image.alt | escape }}"
+                  class="h-28 w-full object-cover transition duration-500 group-hover:scale-105"
+                  loading="lazy"
+                >
+              </a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="space-y-10 lg:pl-6">
+        <div class="space-y-4">
+          {% if product.vendor != blank %}
+            <p class="text-xs font-semibold uppercase tracking-[0.35em] text-gray-400">{{ product.vendor }}</p>
+          {% endif %}
+          <h1 class="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+            {{ product.title }}
+          </h1>
+          <div class="flex flex-wrap items-center gap-4">
+            <div class="flex items-baseline gap-4">
+              <span class="text-3xl font-semibold text-gray-900">{{ current_variant.price | money }}</span>
+              {% if on_sale %}
+                <span class="text-lg font-medium text-gray-400 line-through">{{ current_variant.compare_at_price | money }}</span>
+              {% endif %}
+            </div>
+            {% if current_variant.available %}
+              <span class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">
+                <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                In stock
+              </span>
+            {% else %}
+              <span class="inline-flex items-center gap-2 rounded-full bg-rose-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.25em] text-rose-600">
+                <span class="h-2 w-2 rounded-full bg-rose-500"></span>
+                Out of stock
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        {% form 'product', product, id: 'ProductForm', class: 'space-y-6' %}
+          {% if product.variants.size > 1 %}
+            <div class="space-y-3">
+              <label for="ProductSelect" class="text-sm font-medium text-gray-700">Choose an option</label>
+              <select
+                id="ProductSelect"
+                name="id"
+                class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm focus:border-gray-400 focus:outline-none">
+                {% for variant in product.variants %}
+                  <option value="{{ variant.id }}" {% if variant.id == current_variant.id %}selected{% endif %} {% unless variant.available %}disabled{% endunless %}>
+                    {{ variant.title }} {% if variant.available %}- {{ variant.price | money }}{% else %}- Sold out{% endif %}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          {% else %}
+            <input type="hidden" name="id" value="{{ current_variant.id }}">
+          {% endif %}
+
+          <div class="flex items-center gap-4">
+            <label for="Quantity" class="text-sm font-medium text-gray-700">Quantity</label>
+            <input
+              type="number"
+              id="Quantity"
+              name="quantity"
+              value="1"
+              min="1"
+              class="w-24 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-semibold text-gray-700 focus:border-gray-400 focus:outline-none"
+            >
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="submit"
+              name="add"
+              class="flex-1 rounded-full bg-gray-900 px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-gray-700 {% unless current_variant.available %}pointer-events-none opacity-50{% endunless %}">
+              Add to cart
+            </button>
+            <a
+              href="#product-details"
+              class="flex-1 rounded-full border border-gray-200 px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.3em] text-gray-600 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900">
+              Product details
+            </a>
+          </div>
+        {% endform %}
+
+        <div id="product-details" class="space-y-6 border-t border-gray-200 pt-8">
+          <div class="space-y-3">
+            <h2 class="text-sm font-semibold uppercase tracking-[0.3em] text-gray-500">Description</h2>
+            <div class="prose prose-sm max-w-none text-gray-600 sm:prose-base">
+              {{ product.description | default: 'Discover elevated essentials crafted to transform everyday rituals. Thoughtfully formulated, responsibly produced, and designed for the modern home.' }}
+            </div>
+          </div>
+
+          <div class="grid gap-4 rounded-3xl border border-gray-100 bg-gray-50/70 p-6 text-sm text-gray-600 sm:grid-cols-3 sm:gap-6">
+            <div class="space-y-2">
+              <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-900/5 text-gray-900">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 3 2 9l10 6 10-6-10-6z"/>
+                  <path d="m2 15 10 6 10-6"/>
+                  <path d="m2 9 10 6 10-6"/>
+                </svg>
+              </div>
+              <p class="font-semibold text-gray-800">Premium materials</p>
+              <p>Curated raw materials and small-batch production ensure exceptional quality every time.</p>
+            </div>
+            <div class="space-y-2">
+              <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-900/5 text-gray-900">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M3 3h18v6H3z"/>
+                  <path d="m3 9 9 6 9-6"/>
+                  <path d="M3 21h18v-6H3z"/>
+                  <path d="m3 15 9 6 9-6"/>
+                </svg>
+              </div>
+              <p class="font-semibold text-gray-800">Sustainable packaging</p>
+              <p>We use recyclable glass and paper sourced from responsible mills to reduce our footprint.</p>
+            </div>
+            <div class="space-y-2">
+              <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-900/5 text-gray-900">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 8v8"/>
+                  <path d="M8 12h8"/>
+                  <circle cx="12" cy="12" r="10"/>
+                </svg>
+              </div>
+              <p class="font-semibold text-gray-800">Hassle-free returns</p>
+              <p>Enjoy a 30-day trial. If it is not perfect for your space, send it back on us.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+          <span>SKU: {{ current_variant.sku | default: 'UNLISTED' }}</span>
+          <span>&middot;</span>
+          <span>
+            {% if product.collections.first %}
+              Part of <a href="{{ product.collections.first.url }}" class="font-medium text-gray-700 underline decoration-gray-300 underline-offset-4 hover:text-gray-900">{{ product.collections.first.title }}</a>
+            {% else %}
+              Featured in Uniflame
+            {% endif %}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

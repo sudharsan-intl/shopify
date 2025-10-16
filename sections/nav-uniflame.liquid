@@ -1,0 +1,240 @@
+{%- comment -%}
+UNIFLAME flagship navigation
+- Luxury ecommerce visual language
+- Desktop: mega-style center menu + search + account actions
+- Mobile: full screen panel with quick actions
+{%- endcomment -%}
+
+{% assign url = canonical_url | default: request.origin %}
+{% assign is_home = false %}
+{% assign is_shop = false %}
+{% assign is_collections = false %}
+{% assign is_journal = false %}
+{% assign is_support = false %}
+
+{% if request.page_type == 'index' %}
+  {% assign is_home = true %}
+{% endif %}
+{% if url contains '/collections' or url contains '/products' or url contains '/search' %}
+  {% assign is_shop = true %}
+  {% assign is_collections = true %}
+{% endif %}
+{% if url contains '/blogs' or url contains '/pages/journal' %}
+  {% assign is_journal = true %}
+{% endif %}
+{% if url contains '/pages/contact' or url contains '/pages/support' or url contains '/policies' %}
+  {% assign is_support = true %}
+{% endif %}
+
+<nav class="relative z-50 border-b border-gray-200/70 bg-white/90 backdrop-blur">
+  <div class="hidden border-b border-amber-300/50 bg-amber-50/80 text-[13px] font-medium text-amber-900 md:block">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-2">
+      <span class="tracking-wide">Complimentary shipping over Rs 999 & free 30-day returns.</span>
+      <a href="/pages/support" class="inline-flex items-center gap-2 text-amber-900/80 hover:text-amber-900">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 5v14m7-7H5"/>
+        </svg>
+        Book a styling consultation
+      </a>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex h-20 items-center gap-4">
+      <button type="button"
+              class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 text-gray-700 transition hover:border-gray-300 hover:bg-gray-50 md:hidden"
+              aria-controls="uniflame-mobile-panel"
+              aria-expanded="false"
+              id="uniflame-mobile-toggle">
+        <span class="sr-only">Toggle navigation</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
+      <a href="{{ routes.root_url }}" class="flex items-center gap-3 text-left">
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-lg font-semibold text-white shadow-lg shadow-indigo-500/30">
+          U
+        </span>
+        <div>
+          <p class="text-sm uppercase tracking-[0.5em] text-gray-500">Uniflame</p>
+          <p class="text-lg font-semibold tracking-wide text-gray-900">Elevated Essentials</p>
+        </div>
+      </a>
+
+      <div class="hidden lg:flex flex-1 items-center justify-center gap-10 text-sm font-medium">
+        <a href="{{ routes.root_url }}"
+           class="group inline-flex flex-col items-center gap-1 text-gray-500 transition hover:text-gray-900 {% if is_home %}text-gray-900{% endif %}"
+           aria-current="{% if is_home %}page{% else %}false{% endif %}">
+          <span>Home</span>
+          <span class="h-1 w-10 rounded-full bg-gray-900/0 transition group-hover:bg-gray-900/50 {% if is_home %}!bg-gray-900{% endif %}"></span>
+        </a>
+        <a href="/collections/all"
+           class="group inline-flex flex-col items-center gap-1 text-gray-500 transition hover:text-gray-900 {% if is_shop %}text-gray-900{% endif %}"
+           aria-current="{% if is_shop %}page{% else %}false{% endif %}">
+          <span>Shop</span>
+          <span class="h-1 w-10 rounded-full bg-gray-900/0 transition group-hover:bg-gray-900/50 {% if is_shop %}!bg-gray-900{% endif %}"></span>
+        </a>
+        <a href="/collections"
+           class="group inline-flex flex-col items-center gap-1 text-gray-500 transition hover:text-gray-900 {% if is_collections %}text-gray-900{% endif %}">
+          <span>Collections</span>
+          <span class="h-1 w-10 rounded-full bg-gray-900/0 transition group-hover:bg-gray-900/50 {% if is_collections %}!bg-gray-900{% endif %}"></span>
+        </a>
+        <a href="/blogs/news"
+           class="group inline-flex flex-col items-center gap-1 text-gray-500 transition hover:text-gray-900 {% if is_journal %}text-gray-900{% endif %}">
+          <span>Journal</span>
+          <span class="h-1 w-10 rounded-full bg-gray-900/0 transition group-hover:bg-gray-900/50 {% if is_journal %}!bg-gray-900{% endif %}"></span>
+        </a>
+        <a href="/pages/contact"
+           class="group inline-flex flex-col items-center gap-1 text-gray-500 transition hover:text-gray-900 {% if is_support %}text-gray-900{% endif %}">
+          <span>Support</span>
+          <span class="h-1 w-10 rounded-full bg-gray-900/0 transition group-hover:bg-gray-900/50 {% if is_support %}!bg-gray-900{% endif %}"></span>
+        </a>
+      </div>
+
+      <div class="ml-auto flex items-center gap-2 md:gap-3">
+        <form action="{{ routes.search_url }}" method="get" role="search" class="hidden md:flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-2 text-sm shadow-sm focus-within:border-gray-300 focus-within:shadow">
+          <input type="search"
+                 name="q"
+                 value="{{ search.terms | default: '' | escape }}"
+                 placeholder="Search for candles, scents, gifts…"
+                 class="w-56 bg-transparent placeholder:text-gray-400 focus:outline-none"
+                 autocomplete="off">
+          <button type="submit" class="text-gray-500 transition hover:text-gray-900">
+            <span class="sr-only">Search</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="11" cy="11" r="7"/>
+              <path d="m20 20-3.5-3.5"/>
+            </svg>
+          </button>
+        </form>
+
+        <a href="/pages/wishlist" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 text-gray-500 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900">
+          <span class="sr-only">Wishlist</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 21s-6.2-4.3-8.5-7.4C1.7 11.3 2 7.5 4.5 5.4 6.9 3.3 10 4 12 6.3 14 4 17.1 3.3 19.5 5.4 22 7.5 22.3 11.3 20.5 13.6 18.2 16.7 12 21 12 21Z" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+
+        {% if customer %}
+          <a href="{{ routes.account_url }}" class="hidden sm:inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M19.5 21a7.5 7.5 0 0 0-15 0"/>
+              <circle cx="12" cy="7.5" r="3.5"/>
+            </svg>
+            <span>Hi, {{ customer.first_name | default: 'you' }}</span>
+          </a>
+        {% else %}
+          <a href="{{ routes.account_login_url }}" class="hidden sm:inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 20.5a8.5 8.5 0 1 0-8.5-8.5 8.51 8.51 0 0 0 8.5 8.5Z"/>
+              <path d="M12 16v-8m0 0L9 11m3-3 3 3"/>
+            </svg>
+            <span>Sign in</span>
+          </a>
+        {% endif %}
+
+        <a href="{{ routes.cart_url }}" class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white/90 text-gray-700 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900">
+          <span class="sr-only">Cart</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="9" cy="20" r="1.5"/>
+            <circle cx="18" cy="20" r="1.5"/>
+            <path d="M3 4h2l2.6 11.4a1 1 0 0 0 1 .8H18a1 1 0 0 0 1-.8L21 7H6"/>
+          </svg>
+          {% if cart.item_count > 0 %}
+            <span class="absolute -top-1.5 -right-1.5 min-w-[1.5rem] rounded-full bg-black px-2 text-center text-[11px] font-semibold leading-6 text-white">
+              {{ cart.item_count }}
+            </span>
+          {% endif %}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="uniflame-mobile-panel" class="md:hidden hidden">
+    <div class="space-y-6 border-t border-gray-200 bg-white px-6 pb-10 pt-6 shadow-lg">
+      <form action="{{ routes.search_url }}" method="get" role="search" class="flex items-center gap-3 rounded-full border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm focus-within:border-gray-300 focus-within:shadow">
+        <input type="search"
+               name="q"
+               value="{{ search.terms | default: '' | escape }}"
+               placeholder="Search the collection"
+               class="w-full bg-transparent placeholder:text-gray-400 focus:outline-none">
+        <button type="submit" class="text-gray-500 transition hover:text-gray-900">
+          <span class="sr-only">Search</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="m20 20-3.5-3.5"/>
+          </svg>
+        </button>
+      </form>
+
+      <div class="grid gap-3 text-base font-medium text-gray-700">
+        <a href="{{ routes.root_url }}" class="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 {% if is_home %}bg-gray-50 text-gray-900{% else %}hover:border-gray-300 hover:bg-gray-50{% endif %}">
+          <span>Home</span>
+          <span aria-hidden="true">&gt;</span>
+        </a>
+        <a href="/collections/all" class="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 {% if is_shop %}bg-gray-50 text-gray-900{% else %}hover:border-gray-300 hover:bg-gray-50{% endif %}">
+          <span>Shop</span>
+          <span aria-hidden="true">&gt;</span>
+        </a>
+        <a href="/collections" class="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 {% if is_collections %}bg-gray-50 text-gray-900{% else %}hover:border-gray-300 hover:bg-gray-50{% endif %}">
+          <span>Collections</span>
+          <span aria-hidden="true">&gt;</span>
+        </a>
+        <a href="/blogs/news" class="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 {% if is_journal %}bg-gray-50 text-gray-900{% else %}hover:border-gray-300 hover:bg-gray-50{% endif %}">
+          <span>Journal</span>
+          <span aria-hidden="true">&gt;</span>
+        </a>
+        <a href="/pages/contact" class="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-3 {% if is_support %}bg-gray-50 text-gray-900{% else %}hover:border-gray-300 hover:bg-gray-50{% endif %}">
+          <span>Support</span>
+          <span aria-hidden="true">&gt;</span>
+        </a>
+      </div>
+
+      <div class="grid gap-3 text-sm">
+        {% if customer %}
+          <a href="{{ routes.account_url }}" class="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-4 font-medium text-gray-900">
+            <span>View account</span>
+            <span>{{ customer.first_name | default: 'Account' }}</span>
+          </a>
+        {% else %}
+          <a href="{{ routes.account_login_url }}" class="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-4 font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50">
+            <span>Sign in / Register</span>
+            <span aria-hidden="true">&gt;</span>
+          </a>
+        {% endif %}
+        <a href="{{ routes.cart_url }}" class="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-4 font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50">
+          <span>Cart</span>
+          <span>{% if cart.item_count > 0 %}{{ cart.item_count }} item{% if cart.item_count != 1 %}s{% endif %}{% else %}Empty{% endif %}</span>
+        </a>
+        <a href="/pages/wishlist" class="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-4 font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50">
+          <span>Wishlist</span>
+          <span aria-hidden="true">&gt;</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  (function() {
+    var toggle = document.getElementById('uniflame-mobile-toggle');
+    var panel = document.getElementById('uniflame-mobile-panel');
+    if (!toggle || !panel) return;
+
+    toggle.addEventListener('click', function() {
+      var expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      panel.classList.toggle('hidden');
+      document.body.classList.toggle('overflow-hidden', !expanded);
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "UNIFLAME Nav",
+  "settings": [],
+  "presets": [{ "name": "UNIFLAME Nav" }]
+}
+{% endschema %}

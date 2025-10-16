@@ -1,5 +1,385 @@
-<div class="homepage">
-  <img src="{{ 'weeklyhow-logo.png' | asset_img_url: 'large' }}" class="logo">
-  <h1>Welcome to Shopify Theme Development course!</h1>
-  <p>{% render 'homepage-text' %}</p>
-</div>
+{% assign feature_blocks = section.blocks | where: 'type', 'feature' %}
+{% assign product_blocks = section.blocks | where: 'type', 'product_card' %}
+
+<section class="relative overflow-hidden bg-white">
+  <div aria-hidden="true" class="absolute inset-x-0 -top-48 h-96 bg-gradient-to-b from-indigo-100 via-white to-white blur-3xl"></div>
+
+  <div class="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+    <div class="grid gap-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:items-center">
+      <div class="space-y-8">
+        {% if section.settings.hero_tagline != blank %}
+          <p class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-gray-500">
+            {{ section.settings.hero_tagline }}
+          </p>
+        {% endif %}
+
+        {% if section.settings.hero_heading != blank %}
+          <h1 class="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
+            {{ section.settings.hero_heading }}
+          </h1>
+        {% endif %}
+
+        {% if section.settings.hero_body != blank %}
+          <p class="max-w-xl text-base leading-relaxed text-gray-600 sm:text-lg">
+            {{ section.settings.hero_body }}
+          </p>
+        {% endif %}
+
+        <div class="flex flex-wrap items-center gap-4">
+          {% if section.settings.hero_primary_label != blank %}
+            <a href="{{ section.settings.hero_primary_link | default: routes.root_url }}"
+               class="inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 px-7 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-gray-700">
+              {{ section.settings.hero_primary_label }}
+              <span aria-hidden="true">&rarr;</span>
+            </a>
+          {% endif %}
+          {% if section.settings.hero_secondary_label != blank %}
+            <a href="{{ section.settings.hero_secondary_link | default: routes.collections_url }}"
+               class="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 px-7 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-gray-600 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900">
+              {{ section.settings.hero_secondary_label }}
+            </a>
+          {% endif %}
+          {% if section.settings.hero_stat_value != blank or section.settings.hero_stat_label != blank %}
+            <div class="inline-flex items-center gap-3 rounded-2xl bg-gray-100 px-5 py-3 text-left">
+              {% if section.settings.hero_stat_value != blank %}
+                <span class="text-xl font-semibold text-gray-900">{{ section.settings.hero_stat_value }}</span>
+              {% endif %}
+              {% if section.settings.hero_stat_label != blank %}
+                <span class="max-w-[8rem] text-xs uppercase tracking-[0.3em] text-gray-500">{{ section.settings.hero_stat_label }}</span>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if section.settings.hero_media != blank %}
+        <div class="relative">
+          <div class="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-pink-500/10 blur-3xl"></div>
+          <div class="relative overflow-hidden rounded-[2.5rem] border border-white/60 bg-white shadow-xl shadow-indigo-200/40">
+            <img src="{{ section.settings.hero_media | image_url: width: 1600 }}"
+                 alt="{{ section.settings.hero_media.alt | default: section.settings.hero_heading | escape }}"
+                 class="h-full w-full object-cover"
+                 loading="lazy">
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    {% if feature_blocks.size > 0 %}
+      <div class="mt-20 grid gap-6 md:grid-cols-3">
+        {% for block in feature_blocks %}
+          <div class="group flex flex-col gap-4 overflow-hidden rounded-3xl border border-gray-100 bg-white p-8 text-left shadow-sm shadow-gray-100 transition hover:-translate-y-1 hover:border-gray-200 hover:shadow-lg" {{ block.shopify_attributes }}>
+            {% if block.settings.icon != blank %}
+              <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-900/5 text-lg font-semibold text-gray-900">
+                {{ block.settings.icon }}
+              </div>
+            {% endif %}
+            {% if block.settings.title != blank %}
+              <h2 class="text-lg font-semibold text-gray-900">{{ block.settings.title }}</h2>
+            {% endif %}
+            {% if block.settings.description != blank %}
+              <p class="text-sm leading-relaxed text-gray-600">{{ block.settings.description }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if product_blocks.size > 0 %}
+      <div class="mt-24 space-y-6">
+        {% if section.settings.product_headline != blank %}
+          <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p class="text-sm uppercase tracking-[0.3em] text-gray-400">{{ section.settings.product_kicker }}</p>
+              <h2 class="mt-2 text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">{{ section.settings.product_headline }}</h2>
+            </div>
+            {% if section.settings.product_subheading != blank %}
+              <p class="max-w-xl text-sm text-gray-500 md:text-right">{{ section.settings.product_subheading }}</p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="grid gap-10 md:grid-cols-2 xl:grid-cols-3">
+          {% for block in product_blocks %}
+            {% assign featured_product = block.settings.product %}
+            {% if featured_product %}
+              {% assign product_image = featured_product.featured_image %}
+              <article class="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm shadow-gray-100/70 transition hover:-translate-y-1 hover:border-gray-200 hover:shadow-xl" {{ block.shopify_attributes }}>
+                <div class="relative overflow-hidden bg-gray-100">
+                  <a href="{{ featured_product.url }}" class="block">
+                    {% if product_image %}
+                      <img src="{{ product_image | img_url: '720x' }}"
+                           alt="{{ product_image.alt | default: featured_product.title | escape }}"
+                           class="h-72 w-full object-cover transition duration-700 group-hover:scale-105"
+                           loading="lazy">
+                    {% else %}
+                      <div class="flex h-72 w-full items-center justify-center text-xs font-semibold uppercase tracking-[0.3em] text-gray-400">
+                        No image
+                      </div>
+                    {% endif %}
+                  </a>
+                  {% if featured_product.compare_at_price_max > featured_product.price %}
+                    <span class="absolute left-5 top-5 inline-flex items-center rounded-full bg-black px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+                      Sale
+                    </span>
+                  {% endif %}
+                </div>
+                <div class="flex flex-col gap-5 px-6 py-7">
+                  <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-gray-400">{{ featured_product.vendor }}</p>
+                    <h3 class="mt-2 text-lg font-semibold text-gray-900">
+                      <a href="{{ featured_product.url }}" class="transition hover:text-gray-600">
+                        {{ block.settings.override_title | default: featured_product.title }}
+                      </a>
+                    </h3>
+                    {% if block.settings.summary != blank %}
+                      <p class="mt-3 text-sm leading-relaxed text-gray-600">{{ block.settings.summary }}</p>
+                    {% endif %}
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-lg font-semibold text-gray-900">{{ featured_product.price | money }}</span>
+                    {% if featured_product.available %}
+                      <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-600">
+                        <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                        In stock
+                      </span>
+                    {% else %}
+                      <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-rose-600">
+                        <span class="h-2 w-2 rounded-full bg-rose-500"></span>
+                        Sold out
+                      </span>
+                    {% endif %}
+                  </div>
+                  <a href="{{ featured_product.url }}"
+                     class="inline-flex items-center justify-center gap-2 rounded-full bg-gray-900 px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-gray-700">
+                    View product
+                  </a>
+                </div>
+              </article>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if section.settings.featured_collection != blank %}
+      {% assign highlight_collection = section.settings.featured_collection %}
+      <div class="mt-24 overflow-hidden rounded-[2.5rem] border border-gray-100 bg-gray-50/70 p-10 shadow-inner shadow-gray-100">
+        <div class="flex flex-col gap-6 border-b border-gray-200 pb-8 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="text-sm uppercase tracking-[0.3em] text-gray-400">Collection highlight</p>
+            <h2 class="mt-2 text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
+              {{ highlight_collection.title }}
+            </h2>
+          </div>
+          {% if highlight_collection.description != blank %}
+            <div class="max-w-2xl text-sm text-gray-600 md:text-right">
+              {{ highlight_collection.description }}
+            </div>
+          {% endif %}
+          <a href="{{ highlight_collection.url }}"
+             class="inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-gray-600 transition hover:border-gray-300 hover:bg-white hover:text-gray-900">
+            Explore collection
+            <span aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+
+        {% if highlight_collection.products_count > 0 %}
+          <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {% for product in highlight_collection.products limit: 3 %}
+              {% assign highlight_image = product.featured_image %}
+              <article class="overflow-hidden rounded-3xl bg-white shadow-sm shadow-gray-100 transition hover:-translate-y-1 hover:shadow-md">
+                <a href="{{ product.url }}" class="block overflow-hidden">
+                  {% if highlight_image %}
+                    <img src="{{ highlight_image | img_url: '600x' }}"
+                         alt="{{ highlight_image.alt | default: product.title | escape }}"
+                         class="h-64 w-full object-cover transition duration-700 hover:scale-105"
+                         loading="lazy">
+                  {% else %}
+                    <div class="flex h-64 w-full items-center justify-center text-xs font-semibold uppercase tracking-[0.3em] text-gray-400">
+                      No image
+                    </div>
+                  {% endif %}
+                </a>
+                <div class="px-6 py-5">
+                  <h3 class="text-lg font-semibold text-gray-900">
+                    <a href="{{ product.url }}" class="transition hover:text-gray-600">
+                      {{ product.title }}
+                    </a>
+                  </h3>
+                  <p class="mt-2 text-sm text-gray-500">{{ product.price | money }}</p>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="mt-10 text-sm text-gray-500">Add products to the {{ highlight_collection.title }} collection to feature them here.</p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Homepage",
+  "max_blocks": 12,
+  "settings": [
+    {
+      "type": "text",
+      "id": "hero_tagline",
+      "label": "Hero tagline",
+      "default": "521 products"
+    },
+    {
+      "type": "textarea",
+      "id": "hero_heading",
+      "label": "Hero heading",
+      "default": "Men's T-Shirts – Buy T-Shirts for Men online in India."
+    },
+    {
+      "type": "textarea",
+      "id": "hero_body",
+      "label": "Hero description",
+      "default": "Choose from a wide range of round neck, oversized, graphic, and stylish T-Shirts for men."
+    },
+    {
+      "type": "text",
+      "id": "hero_primary_label",
+      "label": "Primary button label",
+      "default": "Shop the collection"
+    },
+    {
+      "type": "url",
+      "id": "hero_primary_link",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "hero_secondary_label",
+      "label": "Secondary button label",
+      "default": "Discover our process"
+    },
+    {
+      "type": "url",
+      "id": "hero_secondary_link",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "text",
+      "id": "hero_stat_value",
+      "label": "Hero stat value",
+      "default": "48 Hr"
+    },
+    {
+      "type": "text",
+      "id": "hero_stat_label",
+      "label": "Hero stat label",
+      "default": "Clean burn time"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_media",
+      "label": "Hero media"
+    },
+    {
+      "type": "text",
+      "id": "product_kicker",
+      "label": "Product section tagline",
+      "default": "Bestsellers"
+    },
+    {
+      "type": "text",
+      "id": "product_headline",
+      "label": "Product section heading",
+      "default": "Curated favorites"
+    },
+    {
+      "type": "textarea",
+      "id": "product_subheading",
+      "label": "Product section description",
+      "default": "Handpicked fragrances that our community can't stop talking about."
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Highlight collection"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature highlight",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon or emoji",
+          "default": "*"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Hand-poured craftsmanship"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Small-batch production ensures consistent throws and unforgettable scent stories."
+        }
+      ]
+    },
+    {
+      "type": "product_card",
+      "name": "Product spotlight",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "text",
+          "id": "override_title",
+          "label": "Custom title"
+        },
+        {
+          "type": "textarea",
+          "id": "summary",
+          "label": "Short description",
+          "default": "Notes of bergamot, neroli, and soft amber for a calming glow."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Homepage",
+      "blocks": [
+        {
+          "type": "feature"
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "S",
+            "title": "Sustainable materials",
+            "description": "Recycled glass vessels and FSC-certified packaging keep our footprint gentle."
+          }
+        },
+        {
+          "type": "feature",
+          "settings": {
+            "icon": "C",
+            "title": "Complimentary tastings",
+            "description": "Book an in-store ritual to explore scent pairings with our stylists."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
