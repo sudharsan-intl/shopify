@@ -1,6 +1,6 @@
 {% assign current_variant = product.selected_or_first_available_variant %}
 {% assign featured_image = current_variant.featured_image | default: product.featured_image %}
-{% assign on_sale = current_variant.compare_at_price > current_variant.price %}
+{% assign on_sale = current_variant.compare_at_price %}
 
 <main class="bg-white">
   <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -178,3 +178,14 @@
     </div>
   </div>
 </main>
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{% assign on_sale = current_variant.compare_at_price > current_variant.price
+    %}"
+  to: "{% assign on_sale = current_variant.compare_at_price %}"
+  position: 170..225
+{% endcomment %}

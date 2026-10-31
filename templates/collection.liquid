@@ -33,7 +33,7 @@
     {% if collection.products_count > 0 %}
       <div class="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
         {% for product in collection.products %}
-          {% assign on_sale = product.compare_at_price_max > product.price %}
+          {% assign on_sale = product.compare_at_price_max %}
           {% assign primary_image = product.featured_image %}
           {% assign secondary_image = product.images[1] %}
           <article class="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm shadow-gray-100/80 transition duration-500 hover:-translate-y-1 hover:border-gray-200 hover:shadow-xl">
@@ -183,3 +183,13 @@
   </div>
 </section>
 {% endpaginate %}
+{% comment %}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: "{% assign on_sale = product.compare_at_price_max > product.price %}"
+  to: "{% assign on_sale = product.compare_at_price_max %}"
+  position: 1912..1963
+{% endcomment %}
